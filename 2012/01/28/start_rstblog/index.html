@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>heavenshell's note -reStructuredText を使った静的 HTML 生成ツール</title>
+    <meta name="description" content="rstblog">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" href="/static/style.css" rel="stylesheet">
+    <link type="text/css" href="/static/site.css" rel="stylesheet">
+    <link type="text/css" href="/static/_pygments.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <div class="page-header">
+          <h1><a href="/">heavenshell's note</a></h1>
+        </div>
+        <div class="page-nav">
+          <ul>
+            <li><a href="/">blog</a></li>
+            <li><a href="/archive/">archive</a></li>
+            <li><a href="/tags/">tags</a></li>
+            <li><a href="/about/">about</a></li>
+          </ul>
+        </div>
+        <div class="row">
+          <div class="main">
+  <h2 class="title">reStructuredText を使った静的 HTML 生成ツール</h2>
+  
+  <p class="date">written on Saturday, January 28, 2012
+  
+  <p>静的 HTML 生成ツールをブログとして使う最近だと <a class="reference external" href="https://github.com/mojombo/jekyll">Jekyll</a> と <a class="reference external" href="http://octopress.org/">Octpress</a> を使って Github pages と連携させるというのが流行ってるんだろう。</p>
+<p><a class="reference external" href="https://github.com/mojombo/jekyll">Jekyll</a> は Ruby で書かれているツールで、その Python 版として <a class="reference external" href="https://github.com/lakshmivyas/hyde">Hyde</a> というのがあるが、 <a class="reference external" href="http://sphinx-users.jp/">Sphinx</a> 並みにもっと手軽なものがないものかと思ったら、 <a class="reference external" href="http://github.con/mitsuhiko/rstblog">rstblog</a> があったのを思い出した。</p>
+<p><a class="reference external" href="http://github.con/mitsuhiko/rstblog">rstblog</a> は文字通り reStructuredText で本文を記述して HTML を生成する。
+個人的には Markdown 形式より慣れているので嬉しい。</p>
+<div class="section" id="id1">
+<h2>インストール&amp;設定</h2>
+<p>サイト用のディレクトリを作成する。</p>
+<div class="highlight"><pre><span class="nv">$ </span>mkdir -p /path/to/site
+</pre></div>
+<p><a class="reference external" href="http://github.con/mitsuhiko/rstblog">rstblog</a> は PyPi にはアップロードされていないので、Github からダウンロードしてインストールする。</p>
+<div class="highlight"><pre><span class="nv">$ </span>git clone https://github.com/mitsuhiko/rstblog.git
+<span class="nv">$ </span><span class="nb">cd </span>rstblog
+<span class="nv">$ </span>python setup.py install
+</pre></div>
+<p><a class="reference external" href="http://github.con/mitsuhiko/rstblog">rstblog</a> から必要なものをコピーする。</p>
+<div class="highlight"><pre><span class="nv">$ </span>cp -r templates /path/to/site/_templates
+<span class="nv">$ </span><span class="nb">cd</span> /path/to/site
+</pre></div>
+<p>config.yml を作成する。</p>
+<div class="highlight"><pre><span class="nn">---</span>
+<span class="l-Scalar-Plain">active_modules</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">pygments</span><span class="p-Indicator">,</span> <span class="nv">tags</span><span class="p-Indicator">,</span> <span class="nv">blog</span><span class="p-Indicator">,</span> <span class="nv">latex</span><span class="p-Indicator">]</span>
+<span class="l-Scalar-Plain">author</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Your name</span>
+<span class="l-Scalar-Plain">canonical_url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">http://heavenshell.github.com/</span>
+<span class="l-Scalar-Plain">modules</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">pygments</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">style</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">tango</span>
+</pre></div>
+<p>css などの静的ファイルを格納するディレクトリを作成する。
+static ディレクトリにテンプレートから読み込む css ファイルを作成する。</p>
+<div class="highlight"><pre><span class="nv">$ </span>mkdir static
+</pre></div>
+<p>ブログを配信するディレクトリを作成する。
+ディレクトリ名は配信する日付になる。</p>
+<div class="highlight"><pre><span class="nv">$ </span>mkdir -p 2012/01/28
+</pre></div>
+<p>記事を reStructuredText で作成する。</p>
+<div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd </span>2012/01/28
+<span class="nv">$ </span>vim start_rstblog.rst
+</pre></div>
+<div class="highlight"><pre>public: yes
+tags: [python, restructuredtext]
+summary: |
+  reStructuredText を使った静的 HTML 生成ツールを使ってみた
+
+<span class="gh">reStructuredText を使った静的 HTML 生成ツール</span>
+<span class="gh">=============================================</span>
+
+静的 HTML 生成ツールをブログとして使う最近だと <span class="s">`Jekyll </span><span class="si">&lt;https://github.com/mojombo/jekyll&gt;</span><span class="s">`_</span> と <span class="s">`Octpress </span><span class="si">&lt;http://octopress.org/&gt;</span><span class="s">`_</span> を使って Github pages と連携させるというのが流行ってるんだろう。
+</pre></div>
+<p>public はトップの一覧に表示するかどうかの設定。
+これが no の場合トップにリンクが表示されなくなる(ただし url で直接アクセスすれば表示はできる)。
+tags はその記事のタグでタグ一覧に表示される。
+summary はトップページに表示される要約。</p>
+</div>
+<div class="section" id="id2">
+<h2>デザインカスタマイズ</h2>
+<p>自分でデザインなどをカスタマイズするには、基本的に _templates の下のテンプレートファイルを編集する。</p>
+<p>テンプレートエンジンに <a class="reference external" href="http://jinja.pocoo.org/docs/">Jinja2</a> が使われているが、さほど難しい事をやってる訳ではないので、基本的には css をいじる感じ。</p>
+</div>
+<div class="section" id="html">
+<h2>HTML 生成</h2>
+<p>以下のコマンドを実行すると、_build というディレクトリが出来る。</p>
+<div class="highlight"><pre><span class="nv">$ </span>run-rstblog build
+<span class="nv">$ </span>tree _build
+_build
+├── 2012
+│   ├── 01
+│   │   ├── 28
+│   │   │   └── start_rstblog
+│   │   │       └── index.html
+│   │   └── index.html
+│   └── index.html
+├── archive
+│   └── index.html
+├── feed.atom
+├── index.html
+├── static
+│   ├── _pygments.css
+│   ├── site.css
+│   └── style.css
+└── tags
+    ├── index.html
+    ├── python
+    │   ├── feed.atom
+    │   └── index.html
+    └── restructuredtext
+        ├── feed.atom
+        └── index.html
+
+9 directories, 14 files
+</pre></div>
+<p>このまま生成した HTML ファイルをブラウザで開いても css などが絶対パスになるので、組み込みの Web アプリケーションとして起動する。</p>
+<div class="highlight"><pre><span class="nv">$ </span>run-rstblog serve
+Serving on http://127.0.0.1:5000/
+</pre></div>
+<p>ブラウザで <a class="reference external" href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a> にアクセスすると表示される。</p>
+<p>一々コマンドを打つのが面倒くさいので、Makefile にした。</p>
+<div class="highlight"><pre>all: build serve
+
+clean:
+  rm -rf _build
+
+build:
+  run-rstblog build
+
+serve:
+  run-rstblog serve
+</pre></div>
+</div>
+<div class="section" id="id3">
+<h2>まとめ</h2>
+<p>HTML 生成ツールとして <a class="reference external" href="https://github.com/lakshmivyas/hyde">Hyde</a> より手軽な感じがした。</p>
+<p>特に Sphinx をバリバリ使っているような人は reStructuredText になれているだろうから、やりやすいと思う。</p>
+</div>
+
+  
+  <p class="tags">This entry was tagged
+    <a href="/tags/python/">python</a>, <a href="/tags/restructuredtext/">restructuredtext</a> and <a href="/tags/rstblog/">rstblog</a>
+  
+</div>
+          <div class="side">
+            <h2>Recent Posts</h2>
+            <ul class="unstyled">
+            <li><a href="/2012/02/12/modify_rstblog">自作のディレクティブを有効するために</a></li>
+            <li><a href="/2012/02/04/rstblog_directive">rstblog で新規にディレクティブを作成してみる</a></li>
+            <li><a href="/2012/02/02/rstblog_roll">rstblog で新規にロールを作成してみる</a></li>
+            <li><a href="/2012/01/29/recent_post">rstblog で最近のエントリーを表示する</a></li>
+            <li><a href="/2012/01/28/start_rstblog">reStructuredText を使った静的 HTML 生成ツール</a></li>
+            </ul>
+            <h2>Links</h2>
+            <ul class="unstyled">
+            <li><a href="https://github.com/heavenshell/" target="_blank">Github</a></li>
+            <li><a href="http://d.hatena.ne.jp/heavenshell/" target="_blank">Diary</a></li>
+            <li><a href="http://openpear.org/maintainer/heavenshell" target="_blank">Openpear</a></li>
+          </div>
+        </div>
+      </div>
+      <footer>
+        <p>Copyright &copy;2012 heavenshell -Powered by <a href="https://github.com/mitsuhiko/rstblog/" target="_blank">rstblog</a></p>
+      </footer>
+    </div>
+  </body>
+</html>

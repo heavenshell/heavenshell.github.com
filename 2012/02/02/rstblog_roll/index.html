@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>heavenshell's note -rstblog で新規にロールを作成してみる</title>
+    <meta name="description" content="rstblog">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" href="/static/style.css" rel="stylesheet">
+    <link type="text/css" href="/static/site.css" rel="stylesheet">
+    <link type="text/css" href="/static/_pygments.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <div class="page-header">
+          <h1><a href="/">heavenshell's note</a></h1>
+        </div>
+        <div class="page-nav">
+          <ul>
+            <li><a href="/">blog</a></li>
+            <li><a href="/archive/">archive</a></li>
+            <li><a href="/tags/">tags</a></li>
+            <li><a href="/about/">about</a></li>
+          </ul>
+        </div>
+        <div class="row">
+          <div class="main">
+  <h2 class="title">rstblog で新規にロールを作成してみる</h2>
+  
+  <p class="date">written on Thursday, February 2, 2012
+  
+  <p>rstblog を拡張するには modules 以下に自分のモジュールを設置し、config.yml で使用するモジュールを設定する。</p>
+<p>拡張方法には主に reStructuredText のマークアップの種類を増やす方法と <a class="reference external" href="http://jinja.pocoo.org/docs/">Jinja2</a> のテンプレートを拡張する方法がある。</p>
+<p>デフォルトの modules ディレクトリにある latex.py は reStructuredText を拡張するもので、tags.py は <a class="reference external" href="http://jinja.pocoo.org/docs/">Jinja2</a> を拡張する。</p>
+<p>reStructuredText を拡張していくには`ロール`と`ディレクティブ`という概念がある。</p>
+<p>ロールやディレクティブはみんな大好き <a class="reference external" href="http://sphinx-users.jp/doc10/glossary.html#glossary">Sphinx</a> でも同じなので <a class="reference external" href="http://sphinx-users.jp/doc10/glossary.html#glossary">Sphinx</a>  も参考になる。</p>
+<div class="section" id="id1">
+<h2>例</h2>
+<p>ここでは reStructuredText で文字を太字にするだけの bold.py を作ってみる。</p>
+<div class="highlight"><pre>文書中の文字を <span class="na">:bold:</span><span class="nv">`太字にする`</span> のがロール
+</pre></div>
+<p>この場合`太字にする`の部分を &lt;b&gt; タグで括り太字にする。</p>
+<div class="highlight"><pre><span class="nn">---</span>
+<span class="l-Scalar-Plain">active_modules</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">pygments</span><span class="p-Indicator">,</span> <span class="nv">tags</span><span class="p-Indicator">,</span> <span class="nv">blog</span><span class="p-Indicator">,</span> <span class="nv">latex</span><span class="p-Indicator">,</span> <span class="nv">bold</span><span class="p-Indicator">]</span>
+</pre></div>
+<p>まず config.yml で active_modules で使用するモジュール名を設定し、modules に設置する。</p>
+<p>拡張方法は docutils のメソッドを使って拡張していく。</p>
+<p>モジュールは HTML 生成時に必ず setup という関数が呼ばれる。なのでまずこの関数を定義する。</p>
+<div class="highlight"><pre><span class="c"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">docutils</span> <span class="kn">import</span> <span class="n">nodes</span>
+<span class="kn">from</span> <span class="nn">docutils.parsers.rst</span> <span class="kn">import</span> <span class="n">roles</span>
+
+
+<span class="k">def</span> <span class="nf">bold_role</span><span class="p">(</span><span class="n">role</span><span class="p">,</span> <span class="n">rawtext</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">lineno</span><span class="p">,</span> <span class="n">inliner</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{},</span> <span class="n">content</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s">u&#39;&lt;b&gt;</span><span class="si">%s</span><span class="s">&lt;/b&gt;&#39;</span> <span class="o">%</span> <span class="n">text</span>
+    <span class="n">nodes</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;html&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">nodes</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;html&#39;</span><span class="p">)],</span> <span class="p">[]</span>
+
+
+<span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">builder</span><span class="p">):</span>
+    <span class="n">roles</span><span class="o">.</span><span class="n">register_local_role</span><span class="p">(</span><span class="s">&#39;bold&#39;</span><span class="p">,</span> <span class="n">bold_role</span><span class="p">)</span>
+</pre></div>
+<p>setup() 内で roles.register_local_role() の第一引数に reStructuredText で記述するロール名、第二引数で実行するオブジェクトを設定する。</p>
+<p>def bold_role() で rawtext では:bold:<cite>太字にする</cite> が設定される。</p>
+<p>また text には`太字にする`という文字が来る。</p>
+<p>戻り値として [], [] というリストを戻す。</p>
+<p>最初のリストには装飾したテキストの内容を返せば良い。</p>
+<p>二つ目のリストはエラーメッセージなどを返すようなので、空のリストを返す。</p>
+<p>というわけでロールは割と簡単に実装できた。</p>
+</div>
+<div class="section" id="id2">
+<h2>参考文献</h2>
+<ul class="simple">
+<li><a class="reference external" href="http://d.hatena.ne.jp/tk0miya/20111207#p1">(7日目) Sphinx 拡張を作ってみよう (sphinxcontrib.nicovideo)</a></li>
+<li><a class="reference external" href="http://d.hatena.ne.jp/saitodevel01/20100911/1284186786">Docutilsのインラインマークアップを自作する</a></li>
+<li><a class="reference external" href="http://sphinx-users.jp/doc10/glossary.html#glossary">用語集 - Sphinx v1.0.6 documentation</a></li>
+</ul>
+</div>
+
+  
+  <p class="tags">This entry was tagged
+    <a href="/tags/python/">python</a>, <a href="/tags/restructuredtext/">restructuredtext</a> and <a href="/tags/rstblog/">rstblog</a>
+  
+</div>
+          <div class="side">
+            <h2>Recent Posts</h2>
+            <ul class="unstyled">
+            <li><a href="/2012/02/12/modify_rstblog">自作のディレクティブを有効するために</a></li>
+            <li><a href="/2012/02/04/rstblog_directive">rstblog で新規にディレクティブを作成してみる</a></li>
+            <li><a href="/2012/02/02/rstblog_roll">rstblog で新規にロールを作成してみる</a></li>
+            <li><a href="/2012/01/29/recent_post">rstblog で最近のエントリーを表示する</a></li>
+            <li><a href="/2012/01/28/start_rstblog">reStructuredText を使った静的 HTML 生成ツール</a></li>
+            </ul>
+            <h2>Links</h2>
+            <ul class="unstyled">
+            <li><a href="https://github.com/heavenshell/" target="_blank">Github</a></li>
+            <li><a href="http://d.hatena.ne.jp/heavenshell/" target="_blank">Diary</a></li>
+            <li><a href="http://openpear.org/maintainer/heavenshell" target="_blank">Openpear</a></li>
+          </div>
+        </div>
+      </div>
+      <footer>
+        <p>Copyright &copy;2012 heavenshell -Powered by <a href="https://github.com/mitsuhiko/rstblog/" target="_blank">rstblog</a></p>
+      </footer>
+    </div>
+  </body>
+</html>

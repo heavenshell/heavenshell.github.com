@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>heavenshell's note -rstblog で新規にディレクティブを作成してみる</title>
+    <meta name="description" content="rstblog">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" href="/static/style.css" rel="stylesheet">
+    <link type="text/css" href="/static/site.css" rel="stylesheet">
+    <link type="text/css" href="/static/_pygments.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <div class="page-header">
+          <h1><a href="/">heavenshell's note</a></h1>
+        </div>
+        <div class="page-nav">
+          <ul>
+            <li><a href="/">blog</a></li>
+            <li><a href="/archive/">archive</a></li>
+            <li><a href="/tags/">tags</a></li>
+            <li><a href="/about/">about</a></li>
+          </ul>
+        </div>
+        <div class="row">
+          <div class="main">
+  <h2 class="title">rstblog で新規にディレクティブを作成してみる</h2>
+  
+  <p class="date">written on Saturday, February 4, 2012
+  
+  <p>ロールはインラインのマークアップだが、ディレクティブにすると画像を埋め込んだりできるようになる。</p>
+<p>Sphinx には YouTube の動画を埋め込む <a class="reference external" href="https://bitbucket.org/birkenfeld/sphinx-contrib/src/a6ccc86d7631/youtube/">プラグイン</a> がある。</p>
+<div class="highlight"><pre><span class="p">..</span>  <span class="ow">youtube</span><span class="p">::</span> X815fvPU-cw
+</pre></div>
+<p>こんな感じで reStructuredText にディレクティブを書いてやると YouTube のサムネイルが表示されるようになる。</p>
+<iframe src="http://www.youtube.com/embed/X815fvPU-cw" style="border: 0; height: 345px; width: 560px"></iframe><p>こんな感じで表示される。</p>
+<div class="section" id="id2">
+<h2>ディレクティブの作成</h2>
+<p>Sphinx の contrib に YouTube 用のプラグインがあるので、そのまま使えるかと思ったが、そう上手い事行かなかった。</p>
+<p>Sphinx の場合 Sphinx のアプリケーションオブジェクトが定義した setup ハンドラに渡ってくる。</p>
+<p>拡張を書く場合はそのオブジェクトに対してディレクティブを追加するが、rstblog の場合渡ってくるのが rstblog の builder が来る。</p>
+<p>なので、当然そのまま使えない。</p>
+<p>ではどうするのかというと、結局素直に HTML タグを生成して返す他なさそう。</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">YouTube</span><span class="p">(</span><span class="n">Directive</span><span class="p">):</span>
+    <span class="n">has_content</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">required_arguments</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">optional_arguments</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">final_argument_whitespace</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">option_spec</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;width&#39;</span><span class="p">:</span> <span class="n">directives</span><span class="o">.</span><span class="n">unchanged</span><span class="p">,</span>
+        <span class="s">&#39;height&#39;</span><span class="p">:</span> <span class="n">directives</span><span class="o">.</span><span class="n">unchanged</span><span class="p">,</span>
+        <span class="s">&#39;aspect&#39;</span><span class="p">:</span> <span class="n">directives</span><span class="o">.</span><span class="n">unchanged</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s">&#39;aspect&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">:</span>
+            <span class="n">aspect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;aspect&#39;</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;(\d+):(\d+)&#39;</span><span class="p">,</span> <span class="n">aspect</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;invalid aspect ratio </span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">aspect</span><span class="p">)</span>
+            <span class="n">aspect</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">aspect</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="n">get_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="s">&#39;width&#39;</span><span class="p">)</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="n">get_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="s">&#39;height&#39;</span><span class="p">)</span>
+
+        <span class="n">body</span> <span class="o">=</span> <span class="n">make_iframetag</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">aspect</span><span class="o">=</span><span class="n">aspect</span><span class="p">,</span> \
+                              <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">nodes</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;html&#39;</span><span class="p">)]</span>
+
+<span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">builder</span><span class="p">):</span>
+    <span class="n">directives</span><span class="o">.</span><span class="n">register_directive</span><span class="p">(</span><span class="s">&#39;youtube&#39;</span><span class="p">,</span> <span class="n">YouTube</span><span class="p">)</span>
+</pre></div>
+<p>標準で付いている latex.py を参考にし、かつ Sphinx のコートを参考にした。</p>
+</div>
+<div class="section" id="id3">
+<h2>参考文献</h2>
+<ul class="simple">
+<li><a class="reference external" href="http://d.hatena.ne.jp/tk0miya/20111207#p1">(7日目) Sphinx 拡張を作ってみよう (sphinxcontrib.nicovideo)</a></li>
+<li><a class="reference external" href="http://d.hatena.ne.jp/saitodevel01/20100819/1282226573">Docutilsのディレクティブを自作する</a></li>
+</ul>
+</div>
+
+  
+  <p class="tags">This entry was tagged
+    <a href="/tags/python/">python</a>, <a href="/tags/restructuredtext/">restructuredtext</a> and <a href="/tags/rstblog/">rstblog</a>
+  
+</div>
+          <div class="side">
+            <h2>Recent Posts</h2>
+            <ul class="unstyled">
+            <li><a href="/2012/02/12/modify_rstblog">自作のディレクティブを有効するために</a></li>
+            <li><a href="/2012/02/04/rstblog_directive">rstblog で新規にディレクティブを作成してみる</a></li>
+            <li><a href="/2012/02/02/rstblog_roll">rstblog で新規にロールを作成してみる</a></li>
+            <li><a href="/2012/01/29/recent_post">rstblog で最近のエントリーを表示する</a></li>
+            <li><a href="/2012/01/28/start_rstblog">reStructuredText を使った静的 HTML 生成ツール</a></li>
+            </ul>
+            <h2>Links</h2>
+            <ul class="unstyled">
+            <li><a href="https://github.com/heavenshell/" target="_blank">Github</a></li>
+            <li><a href="http://d.hatena.ne.jp/heavenshell/" target="_blank">Diary</a></li>
+            <li><a href="http://openpear.org/maintainer/heavenshell" target="_blank">Openpear</a></li>
+          </div>
+        </div>
+      </div>
+      <footer>
+        <p>Copyright &copy;2012 heavenshell -Powered by <a href="https://github.com/mitsuhiko/rstblog/" target="_blank">rstblog</a></p>
+      </footer>
+    </div>
+  </body>
+</html>

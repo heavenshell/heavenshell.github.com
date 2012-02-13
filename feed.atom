@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title type="text">Recent Blog Posts</title>
+  <id>http://heavenshell.github.com/feed.atom</id>
+  <updated>2012-02-12T00:00:00Z</updated>
+  <link href="http://heavenshell.github.com/" />
+  <link href="http://heavenshell.github.com/feed.atom" rel="self" />
+  <subtitle type="text">Recent blog posts</subtitle>
+  <generator>Werkzeug</generator>
+  <entry xml:base="http://heavenshell.github.com/feed.atom">
+    <title type="text">自作のディレクティブを有効するために</title>
+    <id>http://heavenshell.github.com/2012/02/12/modify_rstblog</id>
+    <updated>2012-02-12T00:00:00Z</updated>
+    <link href="http://heavenshell.github.com/2012/02/12/modify_rstblog" />
+    <author>
+      <name>Shinya Ohyanagi</name>
+    </author>
+    <content type="html">&lt;p&gt;rstblog で自作のロールやディレクティブを有効にする為には現状 &lt;tt class="docutils literal"&gt;rstblog/modules/&lt;/tt&gt; というディレクトリにモジュールを作成する必要がある。&lt;/p&gt;
+&lt;p&gt;手動で &lt;tt class="docutils literal"&gt;rstblog/modules&lt;/tt&gt; に自作のモジュールを入れるのはやはり筋が悪い。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://sphinx-users.jp/"&gt;Sphinx&lt;/a&gt; には &lt;a class="reference external" href="https://bitbucket.org/birkenfeld/sphinx-contrib/overview"&gt;sphinxcontrib&lt;/a&gt; という仕組みがあり、設定ファイルに拡張モジュールを設定する仕組みになっている。&lt;/p&gt;
+&lt;p&gt;rstblog も同様に config.yml に使用する拡張モジュールを設定できるようにすれば良いと思い、パッチを作成した。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="gh"&gt;diff --git a/rstblog/builder.py b/rstblog/builder.py&lt;/span&gt;
+&lt;span class="gh"&gt;index ea659dd..23da103 100644&lt;/span&gt;
+&lt;span class="gd"&gt;--- a/rstblog/builder.py&lt;/span&gt;
+&lt;span class="gi"&gt;+++ b/rstblog/builder.py&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -221,6 +221,11 @@ class Builder(object):&lt;/span&gt;
+             mod.setup(self)
+             self.modules.append(mod)
+
+&lt;span class="gi"&gt;+        for extension in self.config.root_get(&amp;#39;extensions&amp;#39;) or []:&lt;/span&gt;
+&lt;span class="gi"&gt;+            mod = __import__(extension, None, None, [&amp;#39;setup&amp;#39;])&lt;/span&gt;
+&lt;span class="gi"&gt;+            mod.setup(self)&lt;/span&gt;
+&lt;span class="gi"&gt;+            self.modules.append(mod)&lt;/span&gt;
+&lt;span class="gi"&gt;+&lt;/span&gt;
+     @property
+     def default_output_folder(self):
+         return os.path.join(self.project_folder,
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;config.yml に extensions というのがあると利用できるようにした。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nn"&gt;---&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;active_modules&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="p-Indicator"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;pygments&lt;/span&gt;&lt;span class="p-Indicator"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;tags&lt;/span&gt;&lt;span class="p-Indicator"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;blog&lt;/span&gt;&lt;span class="p-Indicator"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;latex&lt;/span&gt;&lt;span class="p-Indicator"&gt;]&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;extensions&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="p-Indicator"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;rstblogcontrib.youtube&lt;/span&gt;&lt;span class="p-Indicator"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;こんな感じでモジュールを設定してやる。&lt;/p&gt;
+&lt;p&gt;とりあえず rstblog 自体に pull request を出してみたが、取り入られるかどうかは微妙な気がする…。&lt;/p&gt;
+</content>
+  </entry>
+  <entry xml:base="http://heavenshell.github.com/feed.atom">
+    <title type="text">rstblog で新規にディレクティブを作成してみる</title>
+    <id>http://heavenshell.github.com/2012/02/04/rstblog_directive</id>
+    <updated>2012-02-04T00:00:00Z</updated>
+    <link href="http://heavenshell.github.com/2012/02/04/rstblog_directive" />
+    <author>
+      <name>Shinya Ohyanagi</name>
+    </author>
+    <content type="html">&lt;p&gt;ロールはインラインのマークアップだが、ディレクティブにすると画像を埋め込んだりできるようになる。&lt;/p&gt;
+&lt;p&gt;Sphinx には YouTube の動画を埋め込む &lt;a class="reference external" href="https://bitbucket.org/birkenfeld/sphinx-contrib/src/a6ccc86d7631/youtube/"&gt;プラグイン&lt;/a&gt; がある。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;..&lt;/span&gt;  &lt;span class="ow"&gt;youtube&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt; X815fvPU-cw
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;こんな感じで reStructuredText にディレクティブを書いてやると YouTube のサムネイルが表示されるようになる。&lt;/p&gt;
+&lt;iframe src="http://www.youtube.com/embed/X815fvPU-cw" style="border: 0; height: 345px; width: 560px"&gt;&lt;/iframe&gt;&lt;p&gt;こんな感じで表示される。&lt;/p&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;ディレクティブの作成&lt;/h2&gt;
+&lt;p&gt;Sphinx の contrib に YouTube 用のプラグインがあるので、そのまま使えるかと思ったが、そう上手い事行かなかった。&lt;/p&gt;
+&lt;p&gt;Sphinx の場合 Sphinx のアプリケーションオブジェクトが定義した setup ハンドラに渡ってくる。&lt;/p&gt;
+&lt;p&gt;拡張を書く場合はそのオブジェクトに対してディレクティブを追加するが、rstblog の場合渡ってくるのが rstblog の builder が来る。&lt;/p&gt;
+&lt;p&gt;なので、当然そのまま使えない。&lt;/p&gt;
+&lt;p&gt;ではどうするのかというと、結局素直に HTML タグを生成して返す他なさそう。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;YouTube&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Directive&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;has_content&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+    &lt;span class="n"&gt;required_arguments&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+    &lt;span class="n"&gt;optional_arguments&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+    &lt;span class="n"&gt;final_argument_whitespace&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;False&lt;/span&gt;
+    &lt;span class="n"&gt;option_spec&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;#39;width&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;directives&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;unchanged&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;#39;height&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;directives&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;unchanged&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;#39;aspect&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;directives&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;unchanged&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;run&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;aspect&amp;#39;&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;options&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;aspect&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;options&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;aspect&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;match&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;(\d+):(\d+)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;aspect&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="k"&gt;raise&lt;/span&gt; &lt;span class="ne"&gt;ValueError&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;invalid aspect ratio &lt;/span&gt;&lt;span class="si"&gt;%r&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;aspect&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="n"&gt;aspect&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;tuple&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;groups&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+        &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;aspect&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;
+        &lt;span class="n"&gt;width&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;get_size&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;options&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;width&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;height&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;get_size&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;options&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;height&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+        &lt;span class="n"&gt;body&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;make_iframetag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;id&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;arguments&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;aspect&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;aspect&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; \
+                              &lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;height&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;height&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;nodes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;body&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;html&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;directives&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;register_directive&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;youtube&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;YouTube&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;標準で付いている latex.py を参考にし、かつ Sphinx のコートを参考にした。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;参考文献&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://d.hatena.ne.jp/tk0miya/20111207#p1"&gt;(7日目) Sphinx 拡張を作ってみよう (sphinxcontrib.nicovideo)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://d.hatena.ne.jp/saitodevel01/20100819/1282226573"&gt;Docutilsのディレクティブを自作する&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry xml:base="http://heavenshell.github.com/feed.atom">
+    <title type="text">rstblog で新規にロールを作成してみる</title>
+    <id>http://heavenshell.github.com/2012/02/02/rstblog_roll</id>
+    <updated>2012-02-02T00:00:00Z</updated>
+    <link href="http://heavenshell.github.com/2012/02/02/rstblog_roll" />
+    <author>
+      <name>Shinya Ohyanagi</name>
+    </author>
+    <content type="html">&lt;p&gt;rstblog を拡張するには modules 以下に自分のモジュールを設置し、config.yml で使用するモジュールを設定する。&lt;/p&gt;
+&lt;p&gt;拡張方法には主に reStructuredText のマークアップの種類を増やす方法と &lt;a class="reference external" href="http://jinja.pocoo.org/docs/"&gt;Jinja2&lt;/a&gt; のテンプレートを拡張する方法がある。&lt;/p&gt;
+&lt;p&gt;デフォルトの modules ディレクトリにある latex.py は reStructuredText を拡張するもので、tags.py は &lt;a class="reference external" href="http://jinja.pocoo.org/docs/"&gt;Jinja2&lt;/a&gt; を拡張する。&lt;/p&gt;
+&lt;p&gt;reStructuredText を拡張していくには`ロール`と`ディレクティブ`という概念がある。&lt;/p&gt;
+&lt;p&gt;ロールやディレクティブはみんな大好き &lt;a class="reference external" href="http://sphinx-users.jp/doc10/glossary.html#glossary"&gt;Sphinx&lt;/a&gt; でも同じなので &lt;a class="reference external" href="http://sphinx-users.jp/doc10/glossary.html#glossary"&gt;Sphinx&lt;/a&gt;  も参考になる。&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;例&lt;/h2&gt;
+&lt;p&gt;ここでは reStructuredText で文字を太字にするだけの bold.py を作ってみる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;文書中の文字を &lt;span class="na"&gt;:bold:&lt;/span&gt;&lt;span class="nv"&gt;`太字にする`&lt;/span&gt; のがロール
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;この場合`太字にする`の部分を &amp;lt;b&amp;gt; タグで括り太字にする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nn"&gt;---&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;active_modules&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="p-Indicator"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;pygments&lt;/span&gt;&lt;span class="p-Indicator"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;tags&lt;/span&gt;&lt;span class="p-Indicator"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;blog&lt;/span&gt;&lt;span class="p-Indicator"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;latex&lt;/span&gt;&lt;span class="p-Indicator"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;bold&lt;/span&gt;&lt;span class="p-Indicator"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;まず config.yml で active_modules で使用するモジュール名を設定し、modules に設置する。&lt;/p&gt;
+&lt;p&gt;拡張方法は docutils のメソッドを使って拡張していく。&lt;/p&gt;
+&lt;p&gt;モジュールは HTML 生成時に必ず setup という関数が呼ばれる。なのでまずこの関数を定義する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;docutils&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;nodes&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;docutils.parsers.rst&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;roles&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;bold_role&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;role&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;rawtext&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;lineno&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;inliner&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;options&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;{},&lt;/span&gt; &lt;span class="n"&gt;content&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[]):&lt;/span&gt;
+    &lt;span class="n"&gt;text&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;u&amp;#39;&amp;lt;b&amp;gt;&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s"&gt;&amp;lt;/b&amp;gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;text&lt;/span&gt;
+    &lt;span class="n"&gt;nodes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;html&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;nodes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;html&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)],&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;roles&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;register_local_role&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;bold&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;bold_role&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;setup() 内で roles.register_local_role() の第一引数に reStructuredText で記述するロール名、第二引数で実行するオブジェクトを設定する。&lt;/p&gt;
+&lt;p&gt;def bold_role() で rawtext では:bold:&lt;cite&gt;太字にする&lt;/cite&gt; が設定される。&lt;/p&gt;
+&lt;p&gt;また text には`太字にする`という文字が来る。&lt;/p&gt;
+&lt;p&gt;戻り値として [], [] というリストを戻す。&lt;/p&gt;
+&lt;p&gt;最初のリストには装飾したテキストの内容を返せば良い。&lt;/p&gt;
+&lt;p&gt;二つ目のリストはエラーメッセージなどを返すようなので、空のリストを返す。&lt;/p&gt;
+&lt;p&gt;というわけでロールは割と簡単に実装できた。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;参考文献&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://d.hatena.ne.jp/tk0miya/20111207#p1"&gt;(7日目) Sphinx 拡張を作ってみよう (sphinxcontrib.nicovideo)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://d.hatena.ne.jp/saitodevel01/20100911/1284186786"&gt;Docutilsのインラインマークアップを自作する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://sphinx-users.jp/doc10/glossary.html#glossary"&gt;用語集 - Sphinx v1.0.6 documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry xml:base="http://heavenshell.github.com/feed.atom">
+    <title type="text">rstblog で最近のエントリーを表示する</title>
+    <id>http://heavenshell.github.com/2012/01/29/recent_post</id>
+    <updated>2012-01-29T00:00:00Z</updated>
+    <link href="http://heavenshell.github.com/2012/01/29/recent_post" />
+    <author>
+      <name>Shinya Ohyanagi</name>
+    </author>
+    <content type="html">&lt;p&gt;ブログなんかはサイドバーに最近のエントリーみたいな形で表示する事が多い。
+&lt;a class="reference external" href="http://octopress.org/"&gt;Octpress&lt;/a&gt; なんかも表示している。&lt;/p&gt;
+&lt;p&gt;rstblog でどうやって表示するか分からなかったのでちょっとだけソースを読んでみた。&lt;/p&gt;
+&lt;p&gt;rstblog/modules/blog.py&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+  &lt;span class="c"&gt;# snip&lt;/span&gt;
+  &lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jinja_env&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;globals&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+      &lt;span class="n"&gt;get_recent_blog_entries&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;get_recent_blog_entries&lt;/span&gt;
+  &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Jinja2 に get_recent_blog_entries というオブジェクトを渡している。&lt;/p&gt;
+&lt;p&gt;なので、テンプレートでこれを呼んでやれば良い。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;side&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;h2&amp;gt;&lt;/span&gt;Recent Posts&lt;span class="nt"&gt;&amp;lt;/h2&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;ul&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;unstyled&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+  {% for entry in get_recent_blog_entries() -%}
+    &lt;span class="nt"&gt;&amp;lt;li&amp;gt;&amp;lt;a&lt;/span&gt; &lt;span class="na"&gt;href=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;{{ link_to(&amp;#39;page&amp;#39;, slug=entry.slug) }}&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;{{ entry.title }}&lt;span class="nt"&gt;&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;&lt;/span&gt;
+  {% endfor -%}
+  &lt;span class="nt"&gt;&amp;lt;/ul&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;get_recent_blog_entries は引数で件数を設定できる。&lt;/p&gt;
+&lt;p&gt;設定しない場合はデフォルトで 10 件取得するようになっている。&lt;/p&gt;
+&lt;p&gt;エントリのタイトルを表示し、リンクとしてエントリの slug を設定すると該当エントリにリンクを設定する事ができる。&lt;/p&gt;
+</content>
+  </entry>
+  <entry xml:base="http://heavenshell.github.com/feed.atom">
+    <title type="text">reStructuredText を使った静的 HTML 生成ツール</title>
+    <id>http://heavenshell.github.com/2012/01/28/start_rstblog</id>
+    <updated>2012-01-28T00:00:00Z</updated>
+    <link href="http://heavenshell.github.com/2012/01/28/start_rstblog" />
+    <author>
+      <name>Shinya Ohyanagi</name>
+    </author>
+    <content type="html">&lt;p&gt;静的 HTML 生成ツールをブログとして使う最近だと &lt;a class="reference external" href="https://github.com/mojombo/jekyll"&gt;Jekyll&lt;/a&gt; と &lt;a class="reference external" href="http://octopress.org/"&gt;Octpress&lt;/a&gt; を使って Github pages と連携させるというのが流行ってるんだろう。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/mojombo/jekyll"&gt;Jekyll&lt;/a&gt; は Ruby で書かれているツールで、その Python 版として &lt;a class="reference external" href="https://github.com/lakshmivyas/hyde"&gt;Hyde&lt;/a&gt; というのがあるが、 &lt;a class="reference external" href="http://sphinx-users.jp/"&gt;Sphinx&lt;/a&gt; 並みにもっと手軽なものがないものかと思ったら、 &lt;a class="reference external" href="http://github.con/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; があったのを思い出した。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://github.con/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; は文字通り reStructuredText で本文を記述して HTML を生成する。
+個人的には Markdown 形式より慣れているので嬉しい。&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;インストール&amp;amp;設定&lt;/h2&gt;
+&lt;p&gt;サイト用のディレクトリを作成する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;mkdir -p /path/to/site
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://github.con/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; は PyPi にはアップロードされていないので、Github からダウンロードしてインストールする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;git clone https://github.com/mitsuhiko/rstblog.git
+&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;cd &lt;/span&gt;rstblog
+&lt;span class="nv"&gt;$ &lt;/span&gt;python setup.py install
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://github.con/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; から必要なものをコピーする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;cp -r templates /path/to/site/_templates
+&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; /path/to/site
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;config.yml を作成する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nn"&gt;---&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;active_modules&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="p-Indicator"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;pygments&lt;/span&gt;&lt;span class="p-Indicator"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;tags&lt;/span&gt;&lt;span class="p-Indicator"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;blog&lt;/span&gt;&lt;span class="p-Indicator"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;latex&lt;/span&gt;&lt;span class="p-Indicator"&gt;]&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;author&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;Your name&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;canonical_url&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;http://heavenshell.github.com/&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;modules&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;pygments&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;style&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;tango&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;css などの静的ファイルを格納するディレクトリを作成する。
+static ディレクトリにテンプレートから読み込む css ファイルを作成する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;mkdir static
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;ブログを配信するディレクトリを作成する。
+ディレクトリ名は配信する日付になる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;mkdir -p 2012/01/28
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;記事を reStructuredText で作成する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;cd &lt;/span&gt;2012/01/28
+&lt;span class="nv"&gt;$ &lt;/span&gt;vim start_rstblog.rst
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;public: yes
+tags: [python, restructuredtext]
+summary: |
+  reStructuredText を使った静的 HTML 生成ツールを使ってみた
+
+&lt;span class="gh"&gt;reStructuredText を使った静的 HTML 生成ツール&lt;/span&gt;
+&lt;span class="gh"&gt;=============================================&lt;/span&gt;
+
+静的 HTML 生成ツールをブログとして使う最近だと &lt;span class="s"&gt;`Jekyll &lt;/span&gt;&lt;span class="si"&gt;&amp;lt;https://github.com/mojombo/jekyll&amp;gt;&lt;/span&gt;&lt;span class="s"&gt;`_&lt;/span&gt; と &lt;span class="s"&gt;`Octpress &lt;/span&gt;&lt;span class="si"&gt;&amp;lt;http://octopress.org/&amp;gt;&lt;/span&gt;&lt;span class="s"&gt;`_&lt;/span&gt; を使って Github pages と連携させるというのが流行ってるんだろう。
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;public はトップの一覧に表示するかどうかの設定。
+これが no の場合トップにリンクが表示されなくなる(ただし url で直接アクセスすれば表示はできる)。
+tags はその記事のタグでタグ一覧に表示される。
+summary はトップページに表示される要約。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;デザインカスタマイズ&lt;/h2&gt;
+&lt;p&gt;自分でデザインなどをカスタマイズするには、基本的に _templates の下のテンプレートファイルを編集する。&lt;/p&gt;
+&lt;p&gt;テンプレートエンジンに &lt;a class="reference external" href="http://jinja.pocoo.org/docs/"&gt;Jinja2&lt;/a&gt; が使われているが、さほど難しい事をやってる訳ではないので、基本的には css をいじる感じ。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="html"&gt;
+&lt;h2&gt;HTML 生成&lt;/h2&gt;
+&lt;p&gt;以下のコマンドを実行すると、_build というディレクトリが出来る。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;run-rstblog build
+&lt;span class="nv"&gt;$ &lt;/span&gt;tree _build
+_build
+├── 2012
+│   ├── 01
+│   │   ├── 28
+│   │   │   └── start_rstblog
+│   │   │       └── index.html
+│   │   └── index.html
+│   └── index.html
+├── archive
+│   └── index.html
+├── feed.atom
+├── index.html
+├── static
+│   ├── _pygments.css
+│   ├── site.css
+│   └── style.css
+└── tags
+    ├── index.html
+    ├── python
+    │   ├── feed.atom
+    │   └── index.html
+    └── restructuredtext
+        ├── feed.atom
+        └── index.html
+
+9 directories, 14 files
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;このまま生成した HTML ファイルをブラウザで開いても css などが絶対パスになるので、組み込みの Web アプリケーションとして起動する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;run-rstblog serve
+Serving on http://127.0.0.1:5000/
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;ブラウザで &lt;a class="reference external" href="http://127.0.0.1:5000/"&gt;http://127.0.0.1:5000/&lt;/a&gt; にアクセスすると表示される。&lt;/p&gt;
+&lt;p&gt;一々コマンドを打つのが面倒くさいので、Makefile にした。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;all: build serve
+
+clean:
+  rm -rf _build
+
+build:
+  run-rstblog build
+
+serve:
+  run-rstblog serve
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;まとめ&lt;/h2&gt;
+&lt;p&gt;HTML 生成ツールとして &lt;a class="reference external" href="https://github.com/lakshmivyas/hyde"&gt;Hyde&lt;/a&gt; より手軽な感じがした。&lt;/p&gt;
+&lt;p&gt;特に Sphinx をバリバリ使っているような人は reStructuredText になれているだろうから、やりやすいと思う。&lt;/p&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+</feed>
+

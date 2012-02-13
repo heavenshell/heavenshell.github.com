@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>heavenshell's note -rstblog で最近のエントリーを表示する</title>
+    <meta name="description" content="rstblog">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" href="/static/style.css" rel="stylesheet">
+    <link type="text/css" href="/static/site.css" rel="stylesheet">
+    <link type="text/css" href="/static/_pygments.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <div class="page-header">
+          <h1><a href="/">heavenshell's note</a></h1>
+        </div>
+        <div class="page-nav">
+          <ul>
+            <li><a href="/">blog</a></li>
+            <li><a href="/archive/">archive</a></li>
+            <li><a href="/tags/">tags</a></li>
+            <li><a href="/about/">about</a></li>
+          </ul>
+        </div>
+        <div class="row">
+          <div class="main">
+  <h2 class="title">rstblog で最近のエントリーを表示する</h2>
+  
+  <p class="date">written on Sunday, January 29, 2012
+  
+  <p>ブログなんかはサイドバーに最近のエントリーみたいな形で表示する事が多い。
+<a class="reference external" href="http://octopress.org/">Octpress</a> なんかも表示している。</p>
+<p>rstblog でどうやって表示するか分からなかったのでちょっとだけソースを読んでみた。</p>
+<p>rstblog/modules/blog.py</p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">builder</span><span class="p">):</span>
+  <span class="c"># snip</span>
+  <span class="n">builder</span><span class="o">.</span><span class="n">jinja_env</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+      <span class="n">get_recent_blog_entries</span><span class="o">=</span><span class="n">get_recent_blog_entries</span>
+  <span class="p">)</span>
+</pre></div>
+<p>Jinja2 に get_recent_blog_entries というオブジェクトを渡している。</p>
+<p>なので、テンプレートでこれを呼んでやれば良い。</p>
+<div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;side&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;h2&gt;</span>Recent Posts<span class="nt">&lt;/h2&gt;</span>
+  <span class="nt">&lt;ul</span> <span class="na">class=</span><span class="s">&quot;unstyled&quot;</span><span class="nt">&gt;</span>
+  {% for entry in get_recent_blog_entries() -%}
+    <span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;{{ link_to(&#39;page&#39;, slug=entry.slug) }}&quot;</span><span class="nt">&gt;</span>{{ entry.title }}<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+  {% endfor -%}
+  <span class="nt">&lt;/ul&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+<p>get_recent_blog_entries は引数で件数を設定できる。</p>
+<p>設定しない場合はデフォルトで 10 件取得するようになっている。</p>
+<p>エントリのタイトルを表示し、リンクとしてエントリの slug を設定すると該当エントリにリンクを設定する事ができる。</p>
+
+  
+  <p class="tags">This entry was tagged
+    <a href="/tags/python/">python</a>, <a href="/tags/restructuredtext/">restructuredtext</a> and <a href="/tags/rstblog/">rstblog</a>
+  
+</div>
+          <div class="side">
+            <h2>Recent Posts</h2>
+            <ul class="unstyled">
+            <li><a href="/2012/02/12/modify_rstblog">自作のディレクティブを有効するために</a></li>
+            <li><a href="/2012/02/04/rstblog_directive">rstblog で新規にディレクティブを作成してみる</a></li>
+            <li><a href="/2012/02/02/rstblog_roll">rstblog で新規にロールを作成してみる</a></li>
+            <li><a href="/2012/01/29/recent_post">rstblog で最近のエントリーを表示する</a></li>
+            <li><a href="/2012/01/28/start_rstblog">reStructuredText を使った静的 HTML 生成ツール</a></li>
+            </ul>
+            <h2>Links</h2>
+            <ul class="unstyled">
+            <li><a href="https://github.com/heavenshell/" target="_blank">Github</a></li>
+            <li><a href="http://d.hatena.ne.jp/heavenshell/" target="_blank">Diary</a></li>
+            <li><a href="http://openpear.org/maintainer/heavenshell" target="_blank">Openpear</a></li>
+          </div>
+        </div>
+      </div>
+      <footer>
+        <p>Copyright &copy;2012 heavenshell -Powered by <a href="https://github.com/mitsuhiko/rstblog/" target="_blank">rstblog</a></p>
+      </footer>
+    </div>
+  </body>
+</html>

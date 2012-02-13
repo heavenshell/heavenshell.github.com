@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>heavenshell's note -自作のディレクティブを有効するために</title>
+    <meta name="description" content="rstblog">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" href="/static/style.css" rel="stylesheet">
+    <link type="text/css" href="/static/site.css" rel="stylesheet">
+    <link type="text/css" href="/static/_pygments.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <div class="page-header">
+          <h1><a href="/">heavenshell's note</a></h1>
+        </div>
+        <div class="page-nav">
+          <ul>
+            <li><a href="/">blog</a></li>
+            <li><a href="/archive/">archive</a></li>
+            <li><a href="/tags/">tags</a></li>
+            <li><a href="/about/">about</a></li>
+          </ul>
+        </div>
+        <div class="row">
+          <div class="main">
+  <h2 class="title">自作のディレクティブを有効するために</h2>
+  
+  <p class="date">written on Sunday, February 12, 2012
+  
+  <p>rstblog で自作のロールやディレクティブを有効にする為には現状 <tt class="docutils literal">rstblog/modules/</tt> というディレクトリにモジュールを作成する必要がある。</p>
+<p>手動で <tt class="docutils literal">rstblog/modules</tt> に自作のモジュールを入れるのはやはり筋が悪い。</p>
+<p><a class="reference external" href="http://sphinx-users.jp/">Sphinx</a> には <a class="reference external" href="https://bitbucket.org/birkenfeld/sphinx-contrib/overview">sphinxcontrib</a> という仕組みがあり、設定ファイルに拡張モジュールを設定する仕組みになっている。</p>
+<p>rstblog も同様に config.yml に使用する拡張モジュールを設定できるようにすれば良いと思い、パッチを作成した。</p>
+<div class="highlight"><pre><span class="gh">diff --git a/rstblog/builder.py b/rstblog/builder.py</span>
+<span class="gh">index ea659dd..23da103 100644</span>
+<span class="gd">--- a/rstblog/builder.py</span>
+<span class="gi">+++ b/rstblog/builder.py</span>
+<span class="gu">@@ -221,6 +221,11 @@ class Builder(object):</span>
+             mod.setup(self)
+             self.modules.append(mod)
+
+<span class="gi">+        for extension in self.config.root_get(&#39;extensions&#39;) or []:</span>
+<span class="gi">+            mod = __import__(extension, None, None, [&#39;setup&#39;])</span>
+<span class="gi">+            mod.setup(self)</span>
+<span class="gi">+            self.modules.append(mod)</span>
+<span class="gi">+</span>
+     @property
+     def default_output_folder(self):
+         return os.path.join(self.project_folder,
+</pre></div>
+<p>config.yml に extensions というのがあると利用できるようにした。</p>
+<div class="highlight"><pre><span class="nn">---</span>
+<span class="l-Scalar-Plain">active_modules</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">pygments</span><span class="p-Indicator">,</span> <span class="nv">tags</span><span class="p-Indicator">,</span> <span class="nv">blog</span><span class="p-Indicator">,</span> <span class="nv">latex</span><span class="p-Indicator">]</span>
+<span class="l-Scalar-Plain">extensions</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">rstblogcontrib.youtube</span><span class="p-Indicator">]</span>
+</pre></div>
+<p>こんな感じでモジュールを設定してやる。</p>
+<p>とりあえず rstblog 自体に pull request を出してみたが、取り入られるかどうかは微妙な気がする…。</p>
+
+  
+  <p class="tags">This entry was tagged
+    <a href="/tags/python/">python</a>, <a href="/tags/restructuredtext/">restructuredtext</a> and <a href="/tags/rstblog/">rstblog</a>
+  
+</div>
+          <div class="side">
+            <h2>Recent Posts</h2>
+            <ul class="unstyled">
+            <li><a href="/2012/02/12/modify_rstblog">自作のディレクティブを有効するために</a></li>
+            <li><a href="/2012/02/04/rstblog_directive">rstblog で新規にディレクティブを作成してみる</a></li>
+            <li><a href="/2012/02/02/rstblog_roll">rstblog で新規にロールを作成してみる</a></li>
+            <li><a href="/2012/01/29/recent_post">rstblog で最近のエントリーを表示する</a></li>
+            <li><a href="/2012/01/28/start_rstblog">reStructuredText を使った静的 HTML 生成ツール</a></li>
+            </ul>
+            <h2>Links</h2>
+            <ul class="unstyled">
+            <li><a href="https://github.com/heavenshell/" target="_blank">Github</a></li>
+            <li><a href="http://d.hatena.ne.jp/heavenshell/" target="_blank">Diary</a></li>
+            <li><a href="http://openpear.org/maintainer/heavenshell" target="_blank">Openpear</a></li>
+          </div>
+        </div>
+      </div>
+      <footer>
+        <p>Copyright &copy;2012 heavenshell -Powered by <a href="https://github.com/mitsuhiko/rstblog/" target="_blank">rstblog</a></p>
+      </footer>
+    </div>
+  </body>
+</html>

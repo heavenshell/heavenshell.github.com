@@ -1,0 +1,142 @@
+html, body {
+  background-color: #eee;
+  color: #3E4349;
+  font-size: 1.15em;
+}
+body {
+  margin: 60px auto;
+  font-family: 'Hiragino Kaku Gothic Pro', 'Garamond','Georgia', serif;
+  font-weight: normal;
+}
+.container > footer p {
+  text-align: center;
+}
+.container {
+  width: 900px;
+}
+.content {
+  background-color: #fff;
+  padding: 25px;
+  margin: 0 -20px;
+  -webkit-border-radius: 7px 7px 7px 7px;
+     -moz-border-radius: 7px 7px 7px 7px;
+          border-radius: 7px 7px 7px 7px;
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+     -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+          box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+.page-header {
+  padding: 20px 20px 10px;
+  margin: -20px -20px 20px;
+  border-bottom: 0;
+  width: 540px;
+  float: left;
+}
+.page-header h1 a {
+  color: inherit;
+}
+.page-header h1 a:hover {
+  color: #0069D6;
+}
+.page-nav {
+  width: 230px;
+  float: right;
+  font-size: 16px;
+}
+.page-nav ul {
+  list-style: none outside none;
+  vertical-align: middle;
+  margin-left: 15px;
+}
+.page-nav li {
+  display: inline;
+  margin: 0 3px;
+}
+h2 a {
+  text-decoration: none;
+  color: inherit;
+}
+h2 a:hover {
+  color: #0069D6;
+}
+.main, .side {
+  float: left;
+  margin-left: 20px;
+  display: inline;
+}
+.content .main {
+  width: 640px;
+}
+.content .side {
+  min-height: 500px;
+  padding-left: 19px;
+  font-size: 14px;
+  width: 210px;
+}
+.side h2 {
+  font-size: 16px;
+  font-weight: bold;
+}
+.side li {
+  list-style: none outside none;
+  margin-bottom: 10px;
+}
+.row p {
+  font-size: 18px;
+  line-height: 1.5em;
+}
+p.tags {
+  margin-top: 30px;
+  color: gray;
+  text-align: right;
+}
+.date {
+  color: gray;
+  margin-bottom: 5px;
+}
+.summary {
+  margin-left: 20px;
+  margin-bottom: 15px;
+}
+.blog-archive ul {
+  margin: 0 0 5px 25px
+}
+.blog-archive li {
+  list-style: none outside none;
+  margin-top: 15px;
+  margin-left: -15px;
+}
+.blog-entry li {
+  margin-left: -5px;
+}
+.blog-archive li:before {
+  content: "❧ ";
+}
+.section h2 {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+.simple li {
+  list-style: none outside none;
+  margin-bottom: 15px;
+  font-size: 18px;
+  margin-left: -15px;
+}
+.simple li:before {
+  content: "❧ ";
+}
+code, tt {
+  background: none repeat scroll 0 0 #EEEEEE;
+}
+.tagcloud {
+  font-size: 16px;
+  list-style: none outside none;
+  margin: 36px 0;
+  padding: 0;
+}
+ul.tagcloud li {
+  display: inline;
+  margin: 0;
+  padding: 0 10px;
+
+}
